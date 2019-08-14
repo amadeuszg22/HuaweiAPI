@@ -1,4 +1,5 @@
 #!/usr/bin/python
+
 import requests
 import pyping
 import time
@@ -6,12 +7,16 @@ from bs4 import BeautifulSoup
 
 class config:
 	host = '192.168.8.1'
+	poling_interval = 60
 	status = '3'
 	max_rtt = '0'
 	avg_rtt = '0'
 	min_rtt = '0'
 	sessionid = False
 	tokenid = False
+	rsrq  = 0
+	rsrp = 0
+	rssi = 0
 
 def ping(host):
 	probe = pyping.ping(host)
@@ -48,7 +53,14 @@ class pool:
 		headers ={'Cookie':config.session,'__RequestVerificationToken':config.tokenid,'Content-Type':'text/xml'}
 		#print (headers['Cookie'])
                 req = requests.get(url, headers=headers)
-		print (req.text)
+		sup = BeautifulSoup(req.text, 'lxml')
+		config.rsrq = sup.response.rsrq.get_text(strip=True)
+		config.rsrp = sup.response.rsrp.get_text(strip=True)
+		config.rssi = sup.response.rssi.get_text(strip=True)
+		if config.rsrq and config.rsrp and config.rssi > 0:
+			return True
+		else:
+			return False
 
 
 while True:
@@ -61,11 +73,17 @@ while True:
 			if pool.auth() is not False:
 				print (time.ctime(),"Authentication token:",config.tokenid)
 				print (time.ctime(),"Sesion ID:",config.session)
-				pool.signal()
+			 	if pool.signal() is not False:
+					print (time.ctime(),"RSRQ:",config.rsrq)
+					print (time.ctime(),"RSRP:",config.rsrp)
+					print (time.ctime(),"RSSI:",config.rssi)
+				else:
+					print ("Unable to get data from modem")
+
 			else:
 				print (time.ctime(),"Unauthorised")
 		else:
 			print (time.ctime(),"Modem HTTP is Down","Code:",pool.home())
 	else:
 		print (time.ctime(),"Host IP:",config.host,"Down")
-	time.sleep(60)
+	time.sleep(config.poling_interval)

@@ -17,6 +17,8 @@ class config:
 	rsrq  = 0
 	rsrp = 0
 	rssi = 0
+	cur_con_time = 0
+
 
 def ping(host):
 	probe = pyping.ping(host)
@@ -62,7 +64,21 @@ class pool:
 		else:
 			return False
 
-
+	@staticmethod
+        def traffic_stat():
+                url="http://"+config.host+"/api/monitoring/traffic-statistics"
+                headers ={'Cookie':config.session,'__RequestVerificationToken':config.tokenid,'Content-Type':'text/xml'}
+                req = requests.get(url, headers=headers)
+                sup = BeautifulSoup(req.text, 'lxml')
+                config.cur_con_time = (float(sup.response.currentconnecttime.get_text(strip=True))/60)/60
+                print(config.cur_con_time)
+		#config.rsrp = sup.response.rsrp.get_text(strip=True)
+                #config.rssi = sup.response.rssi.get_text(strip=True)
+                #if config.rsrq and config.rsrp and config.rssi > 0:
+                #        return True
+                #else:
+                #        return False
+	
 while True:
 	ping(config.host)
 	if config.status == 0 :
@@ -79,7 +95,8 @@ while True:
 					print (time.ctime(),"RSSI:",config.rssi)
 				else:
 					print ("Unable to get data from modem")
-
+				pool.traffic_stat()
+				print ('Current connection time: {:%H:%M:S}'.format(config.cur_con_time))
 			else:
 				print (time.ctime(),"Unauthorised")
 		else:

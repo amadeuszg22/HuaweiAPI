@@ -18,6 +18,7 @@ class config:
 	rsrp = 0
 	rssi = 0
 	cur_con_time = 0
+	cur_up = 0
 
 
 def ping(host):
@@ -71,13 +72,12 @@ class pool:
                 req = requests.get(url, headers=headers)
                 sup = BeautifulSoup(req.text, 'lxml')
                 config.cur_con_time = (float(sup.response.currentconnecttime.get_text(strip=True))/60)/60
-                print(config.cur_con_time)
-		#config.rsrp = sup.response.rsrp.get_text(strip=True)
-                #config.rssi = sup.response.rssi.get_text(strip=True)
-                #if config.rsrq and config.rsrp and config.rssi > 0:
-                #        return True
-                #else:
-                #        return False
+		config.cur_up = ((float(sup.response.currentupload.get_text(strip=True))/1024)/1024)/1024
+		#config.rssi = sup.response.rssi.get_text(strip=True)
+                if config.cur_con_time and config.cur_up  > 0:
+                        return True
+                else:
+                        return False
 	
 while True:
 	ping(config.host)
@@ -94,9 +94,12 @@ while True:
 					print (time.ctime(),"RSRP:",config.rsrp)
 					print (time.ctime(),"RSSI:",config.rssi)
 				else:
-					print ("Unable to get data from modem")
-				pool.traffic_stat()
-				print ('Current connection time: {:%H:%M:S}'.format(config.cur_con_time))
+					print (time.ctime(),"Unable to get data from modem")
+				if pool.traffic_stat() is not False:
+					print (time.ctime(),'Current connection time: {:6.2f}'.format(config.cur_con_time))
+					print (time.ctime(),'Transmited data: {:6.2f} GB'.format(config.cur_up))
+				else:
+					print (time.ctime(),"Unable to get data from modem")
 			else:
 				print (time.ctime(),"Unauthorised")
 		else:

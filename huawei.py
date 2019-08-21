@@ -19,7 +19,9 @@ class config:
 	rssi = 0
 	cur_con_time = 0
 	cur_up = 0
-
+	cur_down = 0
+	cur_down_speed = 0
+	cur_up_speed = 0
 
 def ping(host):
 	probe = pyping.ping(host)
@@ -73,8 +75,10 @@ class pool:
                 sup = BeautifulSoup(req.text, 'lxml')
                 config.cur_con_time = (float(sup.response.currentconnecttime.get_text(strip=True))/60)/60
 		config.cur_up = ((float(sup.response.currentupload.get_text(strip=True))/1024)/1024)/1024
-		#config.rssi = sup.response.rssi.get_text(strip=True)
-                if config.cur_con_time and config.cur_up  > 0:
+		config.cur_down = ((float(sup.response.currentdownload.get_text(strip=True))/1024)/1024)/1024
+		config.cur_down_speed = ((float(sup.response.currentdownloadrate.get_text(strip=True))/1024)/1024)
+		config.cur_up_speed = ((float(sup.response.currentuploadrate.get_text(strip=True))/1024)/1024)
+                if config.cur_con_time and config.cur_up and config.cur_down and config.cur_down_speed and config.cur_up_speed  > 0:
                         return True
                 else:
                         return False
@@ -96,8 +100,11 @@ while True:
 				else:
 					print (time.ctime(),"Unable to get data from modem")
 				if pool.traffic_stat() is not False:
-					print (time.ctime(),'Current connection time: {:6.2f}'.format(config.cur_con_time))
-					print (time.ctime(),'Transmited data: {:6.2f} GB'.format(config.cur_up))
+					print (time.ctime(),'Current connection time:{:6.2f}'.format(config.cur_con_time))
+					print (time.ctime(),'Transmited data:{:6.2f}GB'.format(config.cur_up))
+					print (time.ctime(),'Received data:{:6.2f}GB'.format(config.cur_down))
+					print (time.ctime(),'Current Download speed:{:6.2f}Mbps'.format(config.cur_down_speed))
+					print (time.ctime(),'Current Upload speed:{:6.2f}Mbps'.format(config.cur_up_speed))
 				else:
 					print (time.ctime(),"Unable to get data from modem")
 			else:

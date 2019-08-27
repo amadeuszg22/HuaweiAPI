@@ -22,6 +22,8 @@ class config:
 	cur_down = 0
 	cur_down_speed = 0
 	cur_up_speed = 0
+	tot_up_data = 0
+	tot_down_data = 0
 
 def ping(host):
 	probe = pyping.ping(host)
@@ -78,7 +80,9 @@ class pool:
 		config.cur_down = ((float(sup.response.currentdownload.get_text(strip=True))/1024)/1024)/1024
 		config.cur_down_speed = ((float(sup.response.currentdownloadrate.get_text(strip=True))/1024)/1024)
 		config.cur_up_speed = ((float(sup.response.currentuploadrate.get_text(strip=True))/1024)/1024)
-                if config.cur_con_time and config.cur_up and config.cur_down and config.cur_down_speed and config.cur_up_speed  > 0:
+                config.tot_up_data = (((float(sup.response.totalupload.get_text(strip=True))/1024)/1024)/1024)
+		config.tot_down_data = (((float(sup.response.totaldownload.get_text(strip=True))/1024)/1024)/1024)
+		if config.cur_con_time and config.cur_up and config.cur_down and config.cur_down_speed and config.cur_up_speed and config.tot_up_data and config.tot_down_data  > 0:
                         return True
                 else:
                         return False
@@ -105,6 +109,8 @@ while True:
 					print (time.ctime(),'Received data:{:6.2f}GB'.format(config.cur_down))
 					print (time.ctime(),'Current Download speed:{:6.2f}Mbps'.format(config.cur_down_speed))
 					print (time.ctime(),'Current Upload speed:{:6.2f}Mbps'.format(config.cur_up_speed))
+					print (time.ctime(),'Total Upload data:{:6.2f}GB'.format(config.tot_up_data))
+					print (time.ctime(),'Total Download data:{:6.2f}GB'.format(config.tot_down_data))
 				else:
 					print (time.ctime(),"Unable to get data from modem")
 			else:

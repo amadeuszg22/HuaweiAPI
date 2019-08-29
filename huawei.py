@@ -140,23 +140,17 @@ class pool:
 				data.device.info["classify"] = sup.response.classify.get_text(strip=True)
 				data.device.info["supportmode"] = sup.response.supportmode.get_text(strip=True)
 				data.device.info["workmode"] = sup.response.workmode.get_text(strip=True)
-				print (data.device.info["device_name"])
-				print (data.device.info["serialnumber"])
-				print (data.device.info["imei"])
-				print (data.device.info["imsi"])
-				print (data.device.info["iccid"])
-				print (data.device.info["hardwareversion"])
-				print (data.device.info["softwareversion"])
-				print (data.device.info["webuiversion"])
-				print (data.device.info["macaddress1"])
-				print (data.device.info["productfamily"])
-				print (data.device.info["classify"])
-				print (data.device.info["supportmode"])
-				print (data.device.info["workmode"])
+				# for v in data.device.info.items():
+				if len(data.device.info.items()) > 0:
+					return True
+				else:
+					return False
+					
 
 while True:
 	ping(config.host)
 	if config.status == 0 :
+		print ("-----Host Status:-----")
 		print (time.ctime(),"Host IP:",config.host,"UP")
 		print (time.ctime(),"Ping results:",config.max_rtt,"max rtt",config.avg_rtt,"avg rtt",config.min_rtt,"min rtt")
 		if pool.home() == 200:
@@ -165,12 +159,14 @@ while True:
 				print (time.ctime(),"Authentication token:",config.tokenid)
 				print (time.ctime(),"Sesion ID:",config.session)
 			 	if pool.signal() is not False:
+					print ("-----Signal Statistics:-----")
 					print (time.ctime(),"RSRQ:",config.rsrq)
 					print (time.ctime(),"RSRP:",config.rsrp)
 					print (time.ctime(),"RSSI:",config.rssi)
 				else:
 					print (time.ctime(),"Unable to get data from modem")
 				if pool.traffic_stat() is not False:
+					print ("-----Traffic Statistics:-----")
 					print (time.ctime(),'Current connection time:{:6.2f}'.format(config.cur_con_time))
 					print (time.ctime(),'Total connection time:{:6.2f}'.format(config.tot_con_time))
 					print (time.ctime(),'Transmited data:{:6.2f}GB'.format(config.cur_up))
@@ -182,15 +178,33 @@ while True:
 				else:
 					print (time.ctime(),"Unable to get statisctics from modem")
 				if pool.month_traffic_stat() is not False:
+					print ("-----Monthly Statistics:-----")
 					print (time.ctime(),'This month Download data:{:6.2f}GB'.format(config.month_down_data))
 					print (time.ctime(),'This month UPload data:{:6.2f}GB'.format(config.month_up_data))
 				else:
 					print (time.ctime(),"Unable to get statisctics from modem")
-				pool.dev_info()
+				if pool.dev_info() is not False:
+					print ("-----Device Information's:-----")
+					print (time.ctime(),'Device name:{}'.format(data.device.info["device_name"]))
+					print (time.ctime(),'Serial number:{}'.format(data.device.info["serialnumber"]))
+					print (time.ctime(),'Imei:{}'.format(data.device.info["imei"]))
+					print (time.ctime(),'Imsi:{}'.format(data.device.info["imsi"]))
+					print (time.ctime(),'Iccid:{}'.format(data.device.info["iccid"]))
+					print (time.ctime(),'Hardware version:{}'.format(data.device.info["hardwareversion"]))
+					print (time.ctime(),'Software version:{}'.format(data.device.info["softwareversion"]))
+					print (time.ctime(),'WebUi version :{}'.format(data.device.info["webuiversion"]))
+					print (time.ctime(),'Mac address:{}'.format(data.device.info["macaddress1"]))
+					print (time.ctime(),'Product family:{}'.format(data.device.info["productfamily"]))
+					print (time.ctime(),'Procuct classification:{}'.format(data.device.info["classify"]))
+					print (time.ctime(),'Supported mode:{}'.format(data.device.info["supportmode"]))
+					print (time.ctime(),'Current working mode:{}'.format(data.device.info["workmode"]))
+				else:
+					print (time.ctime(),"Unable to get statisctics from modem")
 			else:
 				print (time.ctime(),"Unauthorised")
 		else:
 			print (time.ctime(),"Modem HTTP is Down","Code:",pool.home())
 	else:
+		print ("-----Host Status:-----")
 		print (time.ctime(),"Host IP:",config.host,"Down")
 	time.sleep(config.poling_interval)

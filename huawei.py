@@ -9,33 +9,27 @@ class config:
 	host = '192.168.8.1'
 	poling_interval = 60
 	status = '3'
-	max_rtt = '0'
-	avg_rtt = '0'
-	min_rtt = '0'
 	sessionid = False
 	tokenid = False
-	rsrq  = 0
-	rsrp = 0
-	rssi = 0
-	cur_con_time = 0
-	cur_up = 0
-	cur_down = 0
-	cur_down_speed = 0
-	cur_up_speed = 0
-	tot_up_data = 0
-	tot_down_data = 0
-	tot_con_time = 0
+	# cur_con_time = 0
+	# cur_up = 0
+	# cur_down = 0
+	# cur_down_speed = 0
+	# cur_up_speed = 0
+	# tot_up_data = 0
+	# tot_down_data = 0
+	# tot_con_time = 0
 	month_up_data = 0
 	month_down_data = 0
 
 class data:
 	class device:
 		info = {
-			"device_name" : " ",
-			"serialnumber" : " ",
-			"imei" : " ",
-			"imsi" : " ",
-			"iccid" : " ",
+			"device_name" : "",
+			"serialnumber" : "",
+			"imei" : "",
+			"imsi" : "",
+			"iccid" : "",
 			"hardwareversion" : "",
 			"softwareversion" : "",
 			"webuiversion" : "",
@@ -45,6 +39,31 @@ class data:
 			"supportmode" : "",
 			"workmode" : "",
 		}
+	class ping_stats():
+		results = {
+			"max_rtt" : "",
+			"avg_rtt" : "",
+			"min_rtt" : "",
+		}
+	class signal_stats():
+		results = {
+			"rsrq" : "",
+			"rsrp" : "",
+			"rssi" : "",		
+		}
+	class data_stats():
+		results ={
+			"cur_con_time" : "",
+			"cur_up" : "",
+			"cur_down" : "",
+			"cur_down_speed" : "",
+			"cur_up_speed" : "",
+			"tot_up_data" : "",
+			"tot_down_data" : "",
+			"tot_con_time" : "",
+			"month_up_data" : "",
+			"month_down_data" : "",
+		}
 		
 
 def ping(host):
@@ -52,9 +71,9 @@ def ping(host):
 	#print ("Host IP:",probe.destination)
 	config.status = probe.ret_code
 	#print ("Ping results:",probe.max_rtt,"max rtt",probe.avg_rtt,"avg rtt",probe.min_rtt,"min rtt")
-	config.max_rtt = probe.max_rtt
-	config.avg_rtt = probe.avg_rtt
-	config.min_rtt = probe.min_rtt
+	data.ping_stats.results["max_rtt"] = probe.max_rtt
+	data.ping_stats.results["avg_rtt"] = probe.avg_rtt
+	data.ping_stats.results["min_rtt"] = probe.min_rtt
 
 class pool:
 	@staticmethod
@@ -78,37 +97,37 @@ class pool:
 			return False
 	@staticmethod
         def signal():
-		url="http://"+config.host+"/api/device/signal"
-		headers ={'Cookie':config.session,'__RequestVerificationToken':config.tokenid,'Content-Type':'text/xml'}
-		#print (headers['Cookie'])
-                req = requests.get(url, headers=headers)
-		sup = BeautifulSoup(req.text, 'lxml')
-		config.rsrq = sup.response.rsrq.get_text(strip=True)
-		config.rsrp = sup.response.rsrp.get_text(strip=True)
-		config.rssi = sup.response.rssi.get_text(strip=True)
-		if config.rsrq and config.rsrp and config.rssi > 0:
-			return True
-		else:
-			return False
+				url="http://"+config.host+"/api/device/signal"
+				headers ={'Cookie':config.session,'__RequestVerificationToken':config.tokenid,'Content-Type':'text/xml'}
+				#print (headers['Cookie'])
+				req = requests.get(url, headers=headers)
+				sup = BeautifulSoup(req.text, 'lxml')
+				data.signal_stats.results["rsrq"] = sup.response.rsrq.get_text(strip=True)
+				data.signal_stats.results["rsrp"] = sup.response.rsrp.get_text(strip=True)
+				data.signal_stats.results["rssi"] = sup.response.rssi.get_text(strip=True)
+				if len(data.signal_stats.results.items()) > 0:
+					return True
+				else:
+					return False
 
 	@staticmethod
         def traffic_stat():
-                url="http://"+config.host+"/api/monitoring/traffic-statistics"
-                headers ={'Cookie':config.session,'__RequestVerificationToken':config.tokenid,'Content-Type':'text/xml'}
-                req = requests.get(url, headers=headers)
-                sup = BeautifulSoup(req.text, 'lxml')
-                config.cur_con_time = (float(sup.response.currentconnecttime.get_text(strip=True))/60)/60
-		config.cur_up = ((float(sup.response.currentupload.get_text(strip=True))/1024)/1024)/1024
-		config.cur_down = ((float(sup.response.currentdownload.get_text(strip=True))/1024)/1024)/1024
-		config.cur_down_speed = ((float(sup.response.currentdownloadrate.get_text(strip=True))/1024)/1024)
-		config.cur_up_speed = ((float(sup.response.currentuploadrate.get_text(strip=True))/1024)/1024)
-		config.tot_up_data = (((float(sup.response.totalupload.get_text(strip=True))/1024)/1024)/1024)
-		config.tot_down_data = (((float(sup.response.totaldownload.get_text(strip=True))/1024)/1024)/1024)
-		config.tot_con_time = (float(sup.response.totalconnecttime.get_text(strip=True))/60)/60
-		if config.cur_con_time and config.cur_up and config.cur_down and config.cur_down_speed and config.cur_up_speed and config.tot_up_data and config.tot_down_data and config.tot_con_time  > 0:
-                        return True
-                else:
-                        return False
+				url="http://"+config.host+"/api/monitoring/traffic-statistics"
+				headers ={'Cookie':config.session,'__RequestVerificationToken':config.tokenid,'Content-Type':'text/xml'}
+				req = requests.get(url, headers=headers)
+				sup = BeautifulSoup(req.text, 'lxml')
+				data.data_stats.results["cur_con_time"] = (float(sup.response.currentconnecttime.get_text(strip=True))/60)/60
+				data.data_stats.results["cur_up"] = ((float(sup.response.currentupload.get_text(strip=True))/1024)/1024)/1024
+				data.data_stats.results["cur_down"] = ((float(sup.response.currentdownload.get_text(strip=True))/1024)/1024)/1024
+				data.data_stats.results["cur_down_speed"] = ((float(sup.response.currentdownloadrate.get_text(strip=True))/1024)/1024)
+				data.data_stats.results["cur_up_speed"] = ((float(sup.response.currentuploadrate.get_text(strip=True))/1024)/1024)
+				data.data_stats.results["tot_up_data"] = (((float(sup.response.totalupload.get_text(strip=True))/1024)/1024)/1024)
+				data.data_stats.results["tot_down_data"] = (((float(sup.response.totaldownload.get_text(strip=True))/1024)/1024)/1024)
+				data.data_stats.results["tot_con_time"] = (float(sup.response.totalconnecttime.get_text(strip=True))/60)/60
+				if len(data.data_stats.results.items()) > 0:
+					return True
+				else:
+					return False
 	@staticmethod
         def month_traffic_stat():
 				url="http://"+config.host+"/api/monitoring/month_statistics"
@@ -152,7 +171,7 @@ while True:
 	if config.status == 0 :
 		print ("-----Host Status:-----")
 		print (time.ctime(),"Host IP:",config.host,"UP")
-		print (time.ctime(),"Ping results:",config.max_rtt,"max rtt",config.avg_rtt,"avg rtt",config.min_rtt,"min rtt")
+		print (time.ctime(),'Ping results:{0} max rtt, {1} avg rtt, {2} min rtt'.format(data.ping_stats.results["max_rtt"],data.ping_stats.results["avg_rtt"],data.ping_stats.results["min_rtt"]))
 		if pool.home() == 200:
 			print (time.ctime(),"Modem HTTP is UP","Code:",pool.home())
 			if pool.auth() is not False:
@@ -160,21 +179,21 @@ while True:
 				print (time.ctime(),"Sesion ID:",config.session)
 			 	if pool.signal() is not False:
 					print ("-----Signal Statistics:-----")
-					print (time.ctime(),"RSRQ:",config.rsrq)
-					print (time.ctime(),"RSRP:",config.rsrp)
-					print (time.ctime(),"RSSI:",config.rssi)
+					print (time.ctime(),"RSRQ:",data.signal_stats.results["rsrq"])
+					print (time.ctime(),"RSRP:",data.signal_stats.results["rsrp"])
+					print (time.ctime(),"RSSI:",data.signal_stats.results["rssi"])
 				else:
 					print (time.ctime(),"Unable to get data from modem")
 				if pool.traffic_stat() is not False:
 					print ("-----Traffic Statistics:-----")
-					print (time.ctime(),'Current connection time:{:6.2f}'.format(config.cur_con_time))
-					print (time.ctime(),'Total connection time:{:6.2f}'.format(config.tot_con_time))
-					print (time.ctime(),'Transmited data:{:6.2f}GB'.format(config.cur_up))
-					print (time.ctime(),'Received data:{:6.2f}GB'.format(config.cur_down))
-					print (time.ctime(),'Current Download speed:{:6.2f}Mbps'.format(config.cur_down_speed))
-					print (time.ctime(),'Current Upload speed:{:6.2f}Mbps'.format(config.cur_up_speed))
-					print (time.ctime(),'Total Upload data:{:6.2f}GB'.format(config.tot_up_data))
-					print (time.ctime(),'Total Download data:{:6.2f}GB'.format(config.tot_down_data))
+					print (time.ctime(),'Current connection time:{:6.2f}'.format(data.data_stats.results["cur_con_time"]))
+					print (time.ctime(),'Total connection time:{:6.2f}'.format(data.data_stats.results["tot_con_time"]))
+					print (time.ctime(),'Transmited data:{:6.2f}GB'.format(data.data_stats.results["cur_up"]))
+					print (time.ctime(),'Received data:{:6.2f}GB'.format(data.data_stats.results["cur_down"]))
+					print (time.ctime(),'Current Download speed:{:6.2f}Mbps'.format(data.data_stats.results["cur_down_speed"]))
+					print (time.ctime(),'Current Upload speed:{:6.2f}Mbps'.format(data.data_stats.results["cur_up_speed"]))
+					print (time.ctime(),'Total Upload data:{:6.2f}GB'.format(data.data_stats.results["tot_up_data"]))
+					print (time.ctime(),'Total Download data:{:6.2f}GB'.format(data.data_stats.results["tot_down_data"]))
 				else:
 					print (time.ctime(),"Unable to get statisctics from modem")
 				if pool.month_traffic_stat() is not False:

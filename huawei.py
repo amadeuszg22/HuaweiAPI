@@ -28,6 +28,17 @@ class config:
 	month_up_data = 0
 	month_down_data = 0
 
+class data:
+	class device:
+		info = {
+			"device_name" : " ",
+			"serialnumber" : " ",
+			"imei" : " ",
+			"imsi" : " ",
+			"iccid" : " ",
+			"hardwareversion" : ""
+		}
+
 def ping(host):
 	probe = pyping.ping(host)
 	#print ("Host IP:",probe.destination)
@@ -108,7 +119,18 @@ class pool:
 				headers ={'Cookie':config.session,'__RequestVerificationToken':config.tokenid,'Content-Type':'text/xml'}
 				req = requests.get(url, headers=headers)
 				sup = BeautifulSoup(req.text, 'lxml')
-				print (sup)
+				data.device.info["device_name"] = sup.response.devicename.get_text(strip=True)
+				data.device.info["serialnumber"] = sup.response.serialnumber.get_text(strip=True)
+				data.device.info["imei"] = sup.response.imei.get_text(strip=True)
+				data.device.info["imsi"] = sup.response.imsi.get_text(strip=True)
+				data.device.info["iccid"] = sup.response.iccid.get_text(strip=True)
+				data.device.info["hardwareversion"] = sup.response.hardwareversion.get_text(strip=True)
+				print (data.device.info["device_name"])
+				print (data.device.info["serialnumber"])
+				print (data.device.info["imei"])
+				print (data.device.info["imsi"])
+				print (data.device.info["iccid"])
+				print (data.device.info["hardwareversion"])
 
 while True:
 	ping(config.host)

@@ -102,6 +102,13 @@ class pool:
 					return True
 				else:
 					return False
+	@staticmethod
+        def dev_info():
+				url="http://"+config.host+"/api/device/information"
+				headers ={'Cookie':config.session,'__RequestVerificationToken':config.tokenid,'Content-Type':'text/xml'}
+				req = requests.get(url, headers=headers)
+				sup = BeautifulSoup(req.text, 'lxml')
+				print (sup)
 
 while True:
 	ping(config.host)
@@ -135,6 +142,7 @@ while True:
 					print (time.ctime(),'This month UPload data:{:6.2f}GB'.format(config.month_up_data))
 				else:
 					print (time.ctime(),"Unable to get statisctics from modem")
+				pool.dev_info()
 			else:
 				print (time.ctime(),"Unauthorised")
 		else:

@@ -36,8 +36,16 @@ class data:
 			"imei" : " ",
 			"imsi" : " ",
 			"iccid" : " ",
-			"hardwareversion" : ""
+			"hardwareversion" : "",
+			"softwareversion" : "",
+			"webuiversion" : "",
+			"macaddress1" : "",
+			"productfamily" : "",
+			"classify" : "",
+			"supportmode" : "",
+			"workmode" : "",
 		}
+		
 
 def ping(host):
 	probe = pyping.ping(host)
@@ -125,12 +133,26 @@ class pool:
 				data.device.info["imsi"] = sup.response.imsi.get_text(strip=True)
 				data.device.info["iccid"] = sup.response.iccid.get_text(strip=True)
 				data.device.info["hardwareversion"] = sup.response.hardwareversion.get_text(strip=True)
+				data.device.info["softwareversion"] = sup.response.softwareversion.get_text(strip=True)
+				data.device.info["webuiversion"] = sup.response.webuiversion.get_text(strip=True)
+				data.device.info["macaddress1"] = sup.response.macaddress1.get_text(strip=True)
+				data.device.info["productfamily"] = sup.response.productfamily.get_text(strip=True)
+				data.device.info["classify"] = sup.response.classify.get_text(strip=True)
+				data.device.info["supportmode"] = sup.response.supportmode.get_text(strip=True)
+				data.device.info["workmode"] = sup.response.workmode.get_text(strip=True)
 				print (data.device.info["device_name"])
 				print (data.device.info["serialnumber"])
 				print (data.device.info["imei"])
 				print (data.device.info["imsi"])
 				print (data.device.info["iccid"])
 				print (data.device.info["hardwareversion"])
+				print (data.device.info["softwareversion"])
+				print (data.device.info["webuiversion"])
+				print (data.device.info["macaddress1"])
+				print (data.device.info["productfamily"])
+				print (data.device.info["classify"])
+				print (data.device.info["supportmode"])
+				print (data.device.info["workmode"])
 
 while True:
 	ping(config.host)

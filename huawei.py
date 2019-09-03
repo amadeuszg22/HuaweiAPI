@@ -11,60 +11,52 @@ class config:
 	status = '3'
 	sessionid = False
 	tokenid = False
-	# cur_con_time = 0
-	# cur_up = 0
-	# cur_down = 0
-	# cur_down_speed = 0
-	# cur_up_speed = 0
-	# tot_up_data = 0
-	# tot_down_data = 0
-	# tot_con_time = 0
 	month_up_data = 0
 	month_down_data = 0
 
 class data:
 	class device:
 		info = {
-			"device_name" : "",
-			"serialnumber" : "",
-			"imei" : "",
-			"imsi" : "",
-			"iccid" : "",
-			"hardwareversion" : "",
-			"softwareversion" : "",
-			"webuiversion" : "",
-			"macaddress1" : "",
-			"productfamily" : "",
-			"classify" : "",
-			"supportmode" : "",
-			"workmode" : "",
+			"device_name" : " ",
+			"serialnumber" : " ",
+			"imei" : " ",
+			"imsi" : " ",
+			"iccid" : " ",
+			"hardwareversion" : " ",
+			"softwareversion" : " ",
+			"webuiversion" : " ",
+			"macaddress1" : " ",
+			"productfamily" : " ",
+			"classify" : " ",
+			"supportmode" : " ",
+			"workmode" : " ",
 		}
 	class ping_stats():
 		results = {
-			"max_rtt" : "",
-			"avg_rtt" : "",
-			"min_rtt" : "",
+			"max_rtt" : " ",
+			"avg_rtt" : " ",
+			"min_rtt" : " ",
 		}
 	class signal_stats():
 		results = {
-			"rsrq" : "",
-			"rsrp" : "",
-			"rssi" : "",		
+			"rsrq" : " ",
+			"rsrp" : " ",
+			"rssi" : " ",		
 		}
 	class data_stats():
 		results ={
-			"cur_con_time" : "",
+			"cur_con_time" : " ",
 			"cur_up" : "",
-			"cur_down" : "",
-			"cur_down_speed" : "",
-			"cur_up_speed" : "",
-			"tot_up_data" : "",
-			"tot_down_data" : "",
-			"tot_con_time" : "",
-			"month_up_data" : "",
-			"month_down_data" : "",
+			"cur_down" : " ",
+			"cur_down_speed" : " ",
+			"cur_up_speed" : " ",
+			"tot_up_data" : " ",
+			"tot_down_data" : " ",
+			"tot_con_time" : " ",
+			#"month_up_data" : " ",
+			#"month_down_data" : " ",
 		}
-		
+			
 
 def ping(host):
 	probe = pyping.ping(host)
@@ -105,7 +97,7 @@ class pool:
 				data.signal_stats.results["rsrq"] = sup.response.rsrq.get_text(strip=True)
 				data.signal_stats.results["rsrp"] = sup.response.rsrp.get_text(strip=True)
 				data.signal_stats.results["rssi"] = sup.response.rssi.get_text(strip=True)
-				if len(data.signal_stats.results.items()) > 0:
+				if any(x == " " for x in data.signal_stats.results.values()) is False:
 					return True
 				else:
 					return False
@@ -124,7 +116,7 @@ class pool:
 				data.data_stats.results["tot_up_data"] = (((float(sup.response.totalupload.get_text(strip=True))/1024)/1024)/1024)
 				data.data_stats.results["tot_down_data"] = (((float(sup.response.totaldownload.get_text(strip=True))/1024)/1024)/1024)
 				data.data_stats.results["tot_con_time"] = (float(sup.response.totalconnecttime.get_text(strip=True))/60)/60
-				if len(data.data_stats.results.items()) > 0:
+				if any(x == " " for x in data.data_stats.results.values()) is False:
 					return True
 				else:
 					return False
@@ -160,7 +152,7 @@ class pool:
 				data.device.info["supportmode"] = sup.response.supportmode.get_text(strip=True)
 				data.device.info["workmode"] = sup.response.workmode.get_text(strip=True)
 				# for v in data.device.info.items():
-				if len(data.device.info.items()) > 0:
+				if any(x == " " for x in data.device.info.values()) is False:
 					return True
 				else:
 					return False
